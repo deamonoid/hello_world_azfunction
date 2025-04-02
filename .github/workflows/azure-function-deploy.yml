@@ -31,7 +31,7 @@ env:
 
 jobs:
   build-and-deploy:
-    runs-on: windows-latest # For Linux, use ubuntu-latest
+    runs-on: ubuntu-latest # For Linux, use ubuntu-latest
     permissions:
           id-token: write # Required for OIDC
           contents: read # Required for actions/checkout
