@@ -25,24 +25,29 @@ on:
     branches: ["main"]
 
 env:
-  AZURE_FUNCTIONAPP_NAME: 'hello_world_azfunction'   # set this to your function app name on Azure
+  AZURE_FUNCTIONAPP_NAME: 'hello-world-azfunction'   # set this to your function app name on Azure
   AZURE_FUNCTIONAPP_PACKAGE_PATH: '.'       # set this to the path to your function app project, defaults to the repository root
   NODE_VERSION: '20.x'                      # set this to the node version to use (e.g. '8.x', '10.x', '12.x')
 
 jobs:
   build-and-deploy:
     runs-on: windows-latest # For Linux, use ubuntu-latest
+    permissions:
+          id-token: write # Required for OIDC
+          contents: read # Required for actions/checkout
     environment: dev
     steps:
     - name: 'Checkout GitHub Action'
       uses: actions/checkout@v4
 
     # If you want to use Azure RBAC instead of Publish Profile, then uncomment the task below
-    # - name: 'Login via Azure CLI'
-    #   uses: azure/login@v1
-    #   with:
-    #     creds: ${{ secrets.AZURE_RBAC_CREDENTIALS }} # set up AZURE_RBAC_CREDENTIALS secrets in your repository
-
+    - name: 'Log in to Azure with AZ CLI'
+      uses: azure/login@v2
+      with:
+        client-id: ${{ vars.AZURE_CLIENT_ID }} # Required to log in with OIDC
+        tenant-id: ${{ vars.AZURE_TENANT_ID }} # Required to log in with OIDC
+        subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }} # Required to log in with OIDC
+    
     - name: Setup Node ${{ env.NODE_VERSION }} Environment
       uses: actions/setup-node@v4
       with:
@@ -63,4 +68,4 @@ jobs:
       with:
         app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
         package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
-        publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }} # Remove publish-profile to use Azure RBAC
+        # publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }} # Remove publish-profile to use Azure RBAC
