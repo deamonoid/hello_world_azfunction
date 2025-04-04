@@ -47,6 +47,11 @@ jobs:
             tenant-id: ${{ env.AZURE_TENANT_ID }}
             subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
 
+        #  To set default subscription context, as identity has no default context.
+        - name: Set Subscription Context        
+          run: |
+            az account set --subscription "$AZURE_SUBSCRIPTION_ID"
+
         - name: Create User Assigned Managed Identity
           run: |
             az identity create --name "$UAMI_NAME" \
