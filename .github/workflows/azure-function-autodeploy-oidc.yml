@@ -27,7 +27,6 @@ env:
     REPO: ${{ github.repository }}
     OWNER: ${{ github.repository_owner }}
     STORAGE_ACCOUNT_NAME: autostorageaccount23
-    PLAN_NAME: consumption
     NODE_VERSION: "20.x"
     ZIP_PATH: "."
 
