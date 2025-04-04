@@ -43,11 +43,12 @@ jobs:
         - name: Azure Login via OIDC
           uses: azure/login@v1
           with:
+            # Cliend ID of Azure Service Principal
             client-id: ${{ secrets.AZURE_CLIENT_ID }}
             tenant-id: ${{ env.AZURE_TENANT_ID }}
             subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
 
-        #  To set default subscription context, as identity has no default context.
+        #  To set default subscription context, if identity has no default context.
         - name: Set Subscription Context        
           run: |
             az account set --subscription "$AZURE_SUBSCRIPTION_ID"
@@ -99,13 +100,6 @@ jobs:
             az functionapp show \
                 --name "$FUNCTIONAPP_NAME" \
                 --resource-group "$FUNCTIONAPP_RG" > /dev/null
-        
-        # Steps for debugging subscription lock
-        - name: Show Account Info
-          run: |
-            az account show
-            az account list --all --output table
-            az role assignment list --assignee ${{ secrets.AZURE_CLIENT_ID }} --output table
 
         - name: Create Storage Account (if app doesn't exist)
           if: steps.checkapp.outcome == 'failure'
@@ -140,7 +134,7 @@ jobs:
             node-version: ${{ env.NODE_VERSION }}
     
         - name: 'Resolve Project Dependencies Using Npm'
-          shell: bash # For Linux, use bash
+          shell: bash
           run: |
             pushd './${{ env.ZIP_PATH }}'
             npm install
