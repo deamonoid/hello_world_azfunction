@@ -80,7 +80,7 @@ jobs:
                 --assignee-object-id ${{ steps.uami.outputs.principal_id}} \
                 --assignee-principal-type ServicePrincipal \
                 --role "Website Contributor" \
-                --scope /subscription/${{env.AZURE_SUBSCRIPTION_ID}}/resourceGroups/${{env.FUNCTIONAPP_RG}}
+                --scope /subscriptions/${{env.AZURE_SUBSCRIPTION_ID}}/resourceGroups/${{env.FUNCTIONAPP_RG}}
 
         - name: Create Federated Credential
           run: |
