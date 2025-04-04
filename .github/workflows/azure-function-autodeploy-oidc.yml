@@ -102,7 +102,10 @@ jobs:
         
         # Steps for debugging subscription lock
         - name: Show Account Info
-          run: az account show
+          run: |
+            az account show
+            az account list --all --output table
+            az role assignment list --assignee ${{ secrets.AZURE_CLIENT_ID }} --output table
 
         - name: Create Storage Account (if app doesn't exist)
           if: steps.checkapp.outcome == 'failure'
