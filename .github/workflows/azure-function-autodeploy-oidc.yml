@@ -3,6 +3,7 @@
 #       Application.ReadWrite.All
 #       AppRoleAssignmentReadWrite.All (Useful for Identity work)
 #       Grant Admin Consent
+# 2. Should have Contributor and User Access Administrator.
 
 name: Create Managed Identity, Federated Credential, Create/Deploy Function App
 
@@ -45,12 +46,6 @@ jobs:
             client-id: ${{ secrets.AZURE_CLIENT_ID }}
             tenant-id: ${{ env.AZURE_TENANT_ID }}
             subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
-
-        #  To set default subscription context, as identity has no default context.
-        - name: Set Subscription Context        
-          run: |
-            az account set --subscription "$AZURE_SUBSCRIPTION_ID"
-
 
         - name: Create User Assigned Managed Identity
           run: |
