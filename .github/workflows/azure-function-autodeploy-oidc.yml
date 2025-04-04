@@ -48,21 +48,21 @@ jobs:
 
         - name: Create User Assigned Managed Identity
           run: |
-            az identity create --name "$UAMI_NAME"
-                --resource-group "$RESOURCE_GROUP"
+            az identity create --name "$UAMI_NAME" \
+                --resource-group "$RESOURCE_GROUP" \
                 --location "$LOCATION"
 
         - name: GET Managed Identity Details
           id: uami
           run: |
-            CLIENT_ID=$(az identity show
-                --name "$UAMI_NAME"
-                --resource-group "$RESOURCE_GROUP"
+            CLIENT_ID=$(az identity show \
+                --name "$UAMI_NAME" \
+                --resource-group "$RESOURCE_GROUP" \
                 --query 'clientId' -o tsv)
             
-            PRINCIPAL_ID=$(az identity show
-                --name "$UAMI_NAME"
-                --resource-group "$RESOURCE_GROUP"
+            PRINCIPAL_ID=$(az identity show \
+                --name "$UAMI_NAME" \
+                --resource-group "$RESOURCE_GROUP" \
                 --query 'principalId' -o tsv)
             
             echo "client_id=$CLIENT_ID" >> $GITHUB_OUTPUT
@@ -70,48 +70,48 @@ jobs:
 
         - name: Assign Website Contributor Role to UAMI
           run: |
-            az role assignment create
-                --assignee-object-id ${{ steps.uami.outputs.principal_id}}
-                --assignee-principal-type ServicePrincipal
-                --role "Website Contributor"
+            az role assignment create \
+                --assignee-object-id ${{ steps.uami.outputs.principal_id}} \
+                --assignee-principal-type ServicePrincipal \
+                --role "Website Contributor" \
                 --scope /subscription/${{env.AZURE_SUBSCRIPTION_ID}}/resourceGroups/${{env.FUNCTIONAPP_RG}}
 
         - name: Create Federated Credential
           run: |
-            az identity federated-credential create
-                --name "$FED_CRED_NAME"
-                --identity-name "$UAMI_NAME"
-                --resource-group "$RESOURCE_GROUP"
-                --issuer "https://token.actions.githubusercontent.com"
-                --subject "repo:${{ env.repo }}:environment:${{ env.ENV_NAME }}"
+            az identity federated-credential create \
+                --name "$FED_CRED_NAME" \
+                --identity-name "$UAMI_NAME" \
+                --resource-group "$RESOURCE_GROUP" \
+                --issuer "https://token.actions.githubusercontent.com" \
+                --subject "repo:${{ env.repo }}:environment:${{ env.ENV_NAME }}" \
                 --audience "api://AzureADTokenExchange"
 
         - name: Check if Function App exists
           id: checkapp
           continue-on-error: true
           run: |
-            az functionapp show
-                --name "$FUNCTIONAPP_NAME"
+            az functionapp show \
+                --name "$FUNCTIONAPP_NAME" \
                 --resource-group "$FUNCTIONAPP_RG" > /dev/null
 
         - name: Create Storage Account (if app doesn't exist)
           if: steps.checkapp.outcome == 'failure'
           run: |
-            az storage account create
-                --name "$STORAGE_ACCOUNT_NAME"
-                --location "$LOCATION"
-                --resource-group "$FUNCTIONAPP_RG"
+            az storage account create \
+                --name "$STORAGE_ACCOUNT_NAME" \
+                --location "$LOCATION" \
+                --resource-group "$FUNCTIONAPP_RG" \
                 --sku Standard_LRS
 
         - name: Create Function App (if app doesn't exist)
           if: steps.checkapp.outcome == 'failure'
           run: |
-            az functionapp create 
-                --consumption-plan-location "$LOCATION" 
-                --name "$FUNCTIONAPP_NAME" 
-                --os-type Windows 
-                --resource-group "$FUNCTIONAPP_RG" 
-                --runtime node
+            az functionapp create \
+                --consumption-plan-location "$LOCATION" \
+                --name "$FUNCTIONAPP_NAME" \
+                --os-type Windows \
+                --resource-group "$FUNCTIONAPP_RG" \
+                --runtime node \
                 --storage-account "$STORAGE_ACCOUNT_NAME"
 
         - name: Re-login as UAMI (OIDC)
