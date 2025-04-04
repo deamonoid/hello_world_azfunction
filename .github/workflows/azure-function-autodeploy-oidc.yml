@@ -89,7 +89,7 @@ jobs:
                 --identity-name "$UAMI_NAME" \
                 --resource-group "$RESOURCE_GROUP" \
                 --issuer "https://token.actions.githubusercontent.com" \
-                --subject "repo:${{ env.repo }}:environment:${{ env.ENV_NAME }}" \
+                --subject "repo:${{ env.REPO }}:environment:${{ env.ENV_NAME }}" \
                 --audience "api://AzureADTokenExchange"
 
         - name: Check if Function App exists
